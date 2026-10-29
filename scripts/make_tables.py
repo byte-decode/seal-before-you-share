@@ -15,6 +15,10 @@ SHORT = {MAIN: "\\textbf{Ours}", "Ours v2.1 (adaptive)": "Ours (adaptive)",
          **{b: b.replace(" (matched PSNR)", "") for b in BASE}}
 COMPARE = [MAIN] + BASE
 
+from decimal import Decimal, ROUND_HALF_UP
+def half_up(x, nd='0.1'):
+    return str(Decimal(str(float(x))).quantize(Decimal(nd), rounding=ROUND_HALF_UP))
+
 def best_mark(vals, higher=True, tol=1e-9):
     arr = np.array(vals, float)
     b = np.nanmax(arr) if higher else np.nanmin(arr)
@@ -153,7 +157,7 @@ else:
         if s == "Threshold (flagged area)":
             continue
         lab = s.replace("False alarm: ", "").replace("Detected: ", "").replace("Social media (resize 0.75 + JPEG 75)", "Resize 0.75 + JPEG 75").replace("sigma ", "$\\sigma{=}$").replace("%", "\\%")
-        rows.append(lab + " & " + " & ".join(f"{float(op.loc[s, c]):.1f}" for c in mcols) + " \\\\")
+        rows.append(lab + " & " + " & ".join(half_up(op.loc[s, c]) for c in mcols) + " \\\\")
     nfa = sum(1 for x in op.index if x.startswith("False alarm"))
     rows.insert(0, "\\multicolumn{4}{l}{\\textit{False alarms on genuine images}} \\\\")
     rows.insert(nfa + 1, "\\midrule\n\\multicolumn{4}{l}{\\textit{Detection of manipulated images}} \\\\")
